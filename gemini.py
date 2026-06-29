@@ -1,29 +1,38 @@
 import os
-from dotenv import load_dotenv
-from google import genai
-from prompts import support_triage_prompt
+import google.generativeai as genai
+from prompts import SUPPORT_TRIAGE_PROMPT
 
-load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-def triage_support_request(issue: str) -> str:
-    api_key = os.getenv("GEMINI_API_KEY")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
-    if not api_key:
-        return (
-            "Category: Test\n"
-            "Priority: Medium\n"
-            "Reason: Gemini API key is not set yet.\n"
-            "Missing info: Add GEMINI_API_KEY to .env.\n"
-            "Draft reply: Thanks for reaching out. We are setting up SupportOps AI and will respond shortly."
-        )
 
-    client = genai.Client(api_key=api_key)
+def fallback_analysis(user_text: str) -> str:
+    text = user_text.lower()
 
-    prompt = support_triage_prompt(issue)
+    if any(word in text for word in ["down", "outage", "cannot access", "can't access", "urgent"]):
+        priority = "High"
+    elif any(word in text for word in ["can't log in", "cannot log in", "login", "password"]):
+        priority = "Medium"
+    else:
+        priority = "Low"
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    return f"""*Issue type:* Account / Access Support
+*Priority:* {priority}
+*Summary:* The user is having trouble with: "{user_text}"
 
-    return response.text
+*Suggested draft reply:*
+Hi, thanks for reaching out. I understand you're having trouble with this. I’ll help look into it now. Please confirm your username/email and whether you are seeing any error message.
+
+*Recommended next action:*
+Check the user's account status, recent login attempts, password reset status, and any related system alerts."""
+
+
+def analyze_support_request(user_text: str) -> str:
+    prompt = SUPPORT_TRIAGE_PROMPT + user_text
+
+    try:
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception:
+        return fallback_analysis(user_text)

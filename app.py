@@ -1,10 +1,11 @@
 import os
 from dotenv import load_dotenv
+from gemini import analyze_support_request, analyze_support_summary
+
 
 load_dotenv()
 
 from slack_bolt import App
-from gemini import analyze_support_request
 
 app = App(
     token=os.getenv("SLACK_BOT_TOKEN"),
@@ -19,6 +20,31 @@ def clean_for_slack(text: str, max_length: int = 2800) -> str:
         return text[:max_length] + "..."
 
     return text
+
+
+@app.command("/support-summary")
+def support_summary(ack, respond, command):
+    ack()
+
+    tickets = command.get("text", "").strip()
+
+    if not tickets:
+        tickets = """
+        1. Student cannot connect laptop to campus Wi-Fi.
+        2. Professor's classroom projector is not displaying.
+        3. Staff member forgot their password and cannot log in.
+        4. User reports slow computer performance after startup.
+        5. Student cannot access Canvas on their phone.
+        """
+
+    try:
+        summary = analyze_support_summary(tickets)
+        summary = clean_for_slack(summary)
+
+        respond(f"*SupportOps AI Daily Summary*\n\n{summary}")
+
+    except Exception as e:
+        respond(f"Sorry, I couldn’t generate the support summary. Error: `{str(e)}`")
 
 
 @app.command("/support")

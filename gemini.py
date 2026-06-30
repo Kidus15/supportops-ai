@@ -1,11 +1,14 @@
 import os
+from dotenv import load_dotenv
 import google.generativeai as genai
-from prompts import SUPPORT_TRIAGE_PROMPT
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+from prompts import SUPPORT_ANALYSIS_PROMPT, SUPPORT_SUMMARY_PROMPT
 
-model = genai.GenerativeModel("gemini-2.0-flash")
+load_dotenv()
 
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 def fallback_analysis(user_text: str) -> str:
     text = user_text.lower()
@@ -36,3 +39,11 @@ def analyze_support_request(user_text: str) -> str:
         return response.text.strip()
     except Exception:
         return fallback_analysis(user_text)
+
+def analyze_support_summary(tickets: str) -> str:
+    prompt = SUPPORT_SUMMARY_PROMPT.format(tickets=tickets)
+    response = model.generate_content(prompt)
+
+    return response.text.strip()
+
+

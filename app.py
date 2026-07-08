@@ -40,6 +40,7 @@ def support_summary(ack, respond, command):
     try:
         summary = analyze_support_summary(tickets)
         summary = clean_for_slack(summary)
+        summary = summary.replace("Daily Support Summary", "").strip()
 
         respond(f"*SupportOps AI Daily Summary*\n\n{summary}")
 

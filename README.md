@@ -1,15 +1,15 @@
 # SupportOps AI
 
-SupportOps AI is a Slack bot that helps support teams quickly triage IT support requests and generate daily support summaries using Gemini AI.
+SupportOps AI is a Slack bot that helps IT support teams triage requests, draft replies, and generate daily support summaries using Gemini AI.
 
 ## Features
 
-- `/support` analyzes a support request
+- `/support` analyzes one support request
 - Categorizes the issue
 - Assigns priority
-- Drafts a helpful reply
-- Recommends the next action
-- `/support-summary` creates a daily summary of support issues, patterns, and next steps
+- Drafts a user-friendly reply
+- Recommends the next support action
+- `/support-summary` summarizes multiple issues and detects patterns
 
 ## Tech Stack
 
@@ -19,39 +19,35 @@ SupportOps AI is a Slack bot that helps support teams quickly triage IT support 
 - GitHub Codespaces
 - dotenv
 
-## Commands
+## Demo Commands
 
-### Analyze a support request
-
-Use `/support` to triage one support ticket.
+### Support Triage
 
 ```text
-/support customer cannot log in
+/support classroom projector is not displaying and the professor has a class starting in 10 minutes
 ```
 
-**Example output:**
+**Output:**
 
-![Support command output](image-3.png)
+![Support triage output](image-6.png)
 
 ---
 
-### Generate a support summary
-
-Use `/support-summary` to summarize multiple support issues and identify patterns.
+### Daily Support Summary
 
 ```text
 /support-summary 3 students cannot connect to campus Wi-Fi, 2 users need password resets, 1 professor's classroom projector is not displaying, 1 staff member reports a slow computer, 1 student cannot access Canvas
 ```
 
-**Example output:**
+**Output:**
 
-![Support summary output](image-4.png)
+![Support summary output](image-5.png)
 
 ---
 
 ## Environment Variables
 
-Create a `.env` file with:
+Create a `.env` file:
 
 ```env
 SLACK_BOT_TOKEN=your_slack_bot_token
@@ -59,9 +55,9 @@ SLACK_SIGNING_SECRET=your_slack_signing_secret
 GOOGLE_API_KEY=your_google_api_key
 ```
 
-Do not commit your `.env` file to GitHub.
+Do not commit `.env` to GitHub.
 
-## Setup
+## Run Locally
 
 Install dependencies:
 
@@ -75,7 +71,7 @@ Run the app:
 python app.py
 ```
 
-The app should show:
+Expected output:
 
 ```text
 Bolt app is running!
@@ -83,25 +79,19 @@ Bolt app is running!
 
 ## Slack Setup
 
-Create two slash commands in your Slack app:
+Create two slash commands in the Slack app dashboard:
 
 ```text
 /support
 /support-summary
 ```
 
-Both commands should use the same Request URL:
+Both should use this request URL format:
 
 ```text
 https://your-codespace-url-3000.app.github.dev/slack/events
 ```
 
-## Demo Flow
+## Project Status
 
-1. Run `/support` with a single issue to show ticket triage.
-2. Run `/support-summary` with multiple issues to show the daily support overview.
-3. Use the screenshots above to quickly show what the bot returns in Slack.
-
-## Status
-
-Working MVP with Slack commands for ticket triage and daily support summaries.
+Working MVP with polished Slack responses for support triage and daily support summaries.
